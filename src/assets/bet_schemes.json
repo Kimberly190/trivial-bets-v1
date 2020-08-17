@@ -1,0 +1,109 @@
+[
+  {
+    "players": [
+      {
+        "player_id": 1,
+        "name": "Anna",
+        "answer": 100
+      },
+      {
+        "player_id": 2,
+        "name": "Bob",
+        "answer": 75
+      },
+      {
+        "player_id": 3,
+        "name": "Carol",
+        "answer": 90
+      }
+    ],
+    "bets": [
+      {
+        "player": 1,
+        "lane": 3,
+        "amount": 7
+      },
+      {
+        "player": 1,
+        "lane": 4,
+        "amount": 1
+      },
+      {
+        "player": 2,
+        "lane": 4,
+        "amount": 1
+      },
+      {
+        "player": 2,
+        "lane": 4,
+        "amount": 3
+      },
+      {
+        "player": 3,
+        "lane": 0,
+        "amount": 3
+      },
+      {
+        "player": 3,
+        "lane": 0,
+        "amount": 1
+      }
+    ]
+  },
+  {
+    "players": [
+      {
+        "player_id": 1,
+        "name": "Anna",
+        "answer": 1918
+      },
+      {
+        "player_id": 2,
+        "name": "Bob",
+        "answer": 1925
+      },
+      {
+        "player_id": 3,
+        "name": "Carol",
+        "answer": 1925
+      },
+      {
+        "player_id": 4,
+        "name": "Dave",
+        "answer": 1926
+      },
+      {
+        "player_id": 5,
+        "name": "Ethel",
+        "answer": 1931
+      }
+    ],
+    "bets": [
+      {
+        "player": 1,
+        "lane": 0,
+        "amount": 6
+      },
+      {
+        "player": 2,
+        "lane": 3,
+        "amount": 1
+      },
+      {
+        "player": 3,
+        "lane": 0,
+        "amount": 2
+      },
+      {
+        "player": 4,
+        "lane": 5,
+        "amount": 8
+      },
+      {
+        "player": 5,
+        "lane": 5,
+        "amount": 2
+      }
+    ]
+  }
+]

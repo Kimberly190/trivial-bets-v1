@@ -1,0 +1,4 @@
+<div class="chip placeholder"></div>
+<div *ngIf="betData.amount > 1" class="chip red-chip"></div>
+<div *ngIf="betData.amount >= 6" class="chip blue-chip"></div>
+<div class="chip player-chip player-{{ betData.player }}">{{ betData.amount }}</div>

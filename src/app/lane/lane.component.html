@@ -1,0 +1,7 @@
+<h2>PAYS<br>{{ payRate }} to 1</h2>
+<div *ngIf="laneData.name" class="player-card player-{{laneData.player_id}}"><h4>{{laneData.name}}</h4>{{laneData.answer}}</div>
+<div class="lane-space" [attr.id]="laneData.lane == 0 ? 'undercut-lane' : null">
+  <div *ngIf="laneData.lane == 0" id="watermark">ALL ANSWERS TOO HIGH</div>
+  <app-bet *ngFor="let bet of bets" class="bet" [betData]="bet"></app-bet>
+</div>
+<button *ngIf="laneData.answer || laneData.lane == 0" class="bet-button">Bet</button>
