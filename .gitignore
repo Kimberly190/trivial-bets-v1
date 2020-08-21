@@ -14,3 +14,9 @@ ref/*
 
 # Local History for Visual Studio Code
 .history/
+
+# Custom
+run vs code.bat
+trivial-bets.zip
+docs/~*
+docs/api notes.txt

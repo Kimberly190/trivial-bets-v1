@@ -1,0 +1,29 @@
+<!-- <div class="player-status player-1">
+    <h3>Anna</h3>
+    12
+</div>
+<div class="player-status player-2">
+    <h3>Bob</h3>
+    10
+</div>
+<div class="player-status player-3">
+    <h3>Carol</h3>
+    17
+</div>
+<div class="player-status player-4">
+    <h3>P4</h3>
+</div>
+<div class="player-status player-5">
+    <h3>P5</h3>
+</div>
+<div class="player-status player-6">
+    <h3>P6</h3>
+</div>
+<div class="player-status player-7">
+    <h3>P7</h3>
+</div>-->
+
+<div *ngFor="let player of playerData" class="player-status player-{{player.player_id}}">
+  <h3>{{player.name}}</h3>
+  {{player.answer}}
+</div>

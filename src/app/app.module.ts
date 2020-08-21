@@ -11,13 +11,14 @@ import { LaneComponent } from './lane/lane.component';
 import { BetComponent } from './bet/bet.component';
 
 import { TempService } from './temp.service';
+import { StatusBenchComponent } from './status-bench/status-bench.component';
 
 @NgModule({
   imports:      [ BrowserModule, FormsModule, HttpClientModule,
     RouterModule.forRoot([
       { path: '', component: GameBoardComponent }
     ]) ],
-  declarations: [ AppComponent, HeaderComponent, GameBoardComponent, LaneComponent, BetComponent ],
+  declarations: [ AppComponent, HeaderComponent, GameBoardComponent, LaneComponent, BetComponent, StatusBenchComponent ],
   bootstrap:    [ AppComponent ],
   providers: [TempService]
 })

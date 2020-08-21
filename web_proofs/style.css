@@ -41,6 +41,7 @@ h3, .player-card {
 #gameboard {
     max-width: 1000px;
     height: 75vh;
+    min-height: 300px;
     margin: auto;
     padding: 0 2vw;
 
@@ -62,11 +63,16 @@ h3, .player-card {
     grid-template-columns: none;
 }
 
+.hidden {
+  display: none;
+}
+
 .lane-space {
     position: relative;
 
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
 #undercut-lane {
@@ -103,7 +109,7 @@ h3, .player-card {
     max-width: 50px;
     height: 7.5vw;
     max-height: 50px;
-    margin: auto;
+    margin: auto auto;
 
     border-radius: 50%;
     font-weight: bold;
@@ -240,5 +246,10 @@ h3, .player-card {
 
 .player-7 {
     background-color: white;
-    border: 2px solid black;
+    border: 2px solid magenta;
+}
+
+.player-0 {
+    background: white;
+    border: 2px dashed black;
 }

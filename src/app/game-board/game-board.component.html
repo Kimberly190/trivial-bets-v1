@@ -1,19 +1,9 @@
 <section id="gameboard">
-
-<!-- TODO: hide lanes not using? -->
-  <!-- <div *ngFor="let thing of stuff">
-    <ng-container *ngIf="show">
-      {{log(thing)}}
-      <span>{{thing.name}}</span>
-    </ng-container>
-  </div> -->
-
-  <app-lane *ngFor="let item of laneData" class="lane" [laneData]=item [bets]=item.bets></app-lane>
+  <app-lane *ngFor="let item of laneData"  [laneData]=item [bets]=item.bets [ngClass]="(item.answer === undefined && item.lane !== 0) ? 'hidden' : 'lane'"></app-lane>
 </section>
 <!-- TODO: remove -->
 <div style="margin-top:40px;">
-  <button (click)="getAnswers1()">Get Answers 1</button>
-  <button (click)="getAnswers2()">Get Answers 2</button>
+  <button (click)="getAnswers()">Get Next Answers</button>
   &nbsp;|&nbsp;
   <button (click)="setBets()">Set Bets</button>
 </div>

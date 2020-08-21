@@ -15,9 +15,8 @@ export class GameBoardComponent implements OnInit {
   //TODO: implement models
   gameData;
   players;
-  bets;
   laneData;
-  NUM_LANES = 7;
+  currentQuestion = -1;
 
   constructor(
     private tempService: TempService
@@ -26,68 +25,30 @@ export class GameBoardComponent implements OnInit {
   ngOnInit() {
     this.tempService.getAnswersAndBets().subscribe(
       data => {
-        console.log("got game data:");
-        console.log(data);
+        console.log("got game data: ", data);
         this.gameData = data;
 
-        this.getAnswers1();
+        //TODO support initial state
+        this.getAnswers();
       },
       error => {
-        console.log("error getting game data.");
-        console.log(error);
+        console.log("error getting game data: ", error);
       }
     );
   }
 
-  distributeAnswers(playerAnswers): any[] {
-    let laneResults = [];
-
-    let sorted = playerAnswers.filter(Boolean).sort((a, b) => { return a.answer - b.answer; });
-
-    //TODO handle case of even answers
-    let startLane = (this.NUM_LANES - sorted.length) / 2 + 1;
-
-    let payRates = [6, 5, 4, 3, 2, 3, 4, 5];
-    let laneData;
-    for (let i = 0; i < this.NUM_LANES + 1; i++) {
-      if (i >= startLane && i < startLane + sorted.length) {
-        laneData = sorted[i - startLane];
-      } else {
-        laneData = { };
-      }
-
-      laneData.lane = i;
-      laneData.bets = [];
-      laneData.payRate = payRates[i];
-      laneResults.push(laneData);
+  getAnswers() {
+    this.currentQuestion++;
+    //TODO remove / change to 7 question max?
+    if (this.currentQuestion >= this.gameData.length) {
+      this.currentQuestion = 0;
     }
-
-    return laneResults;
-  }
-
-  getAnswers1() {
-    this.players = this.gameData[0].players;
-    this.bets = this.gameData[0].bets;
-    this.laneData = this.distributeAnswers(this.players);
-  }
-
-  getAnswers2() {
-    this.players = this.gameData[1].players;
-    this.bets = this.gameData[1].bets;
-    this.laneData = this.distributeAnswers(this.players);
+    this.players = this.gameData[this.currentQuestion].players;
+    this.laneData = this.tempService.distributeAnswers(this.players);
   }
 
   setBets() {
-    for (let i = 0; i < this.bets.length; i++)
-    {
-      let bet = this.bets[i];
-      let laneDatum = this.laneData.find(a => a.lane == bet.lane);
-
-      if (laneDatum) {
-        laneDatum.bets.push(bet);
-      } else {
-        console.log('could not find lane for bet ' + bet.amount + ' lane ' + bet.lane);
-      }
-    }
+    //TODO review separation of concerns here
+    this.tempService.setBets(this.laneData, this.gameData[this.currentQuestion].bets);
   }
 }
