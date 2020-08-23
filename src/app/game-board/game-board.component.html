@@ -1,5 +1,5 @@
 <section id="gameboard">
-  <app-lane *ngFor="let item of laneData"  [laneData]=item [bets]=item.bets [ngClass]="(item.answer === undefined && item.lane !== 0) ? 'hidden' : 'lane'"></app-lane>
+  <app-lane *ngFor="let item of laneData"  [laneData]=item [bets]=item.bets [answers]=item.answers [ngClass]="(item.answers.length == 0 && item.lane !== 0) ? 'hidden' : 'lane'"></app-lane>
 </section>
 <!-- TODO: remove -->
 <div style="margin-top:40px;">

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-//import { NgZone } from '@angular/core';
 
-import { TempService } from '../temp.service';
+import { GameApiService } from '../game-api.service';
+
+import * as models from '../models';
 
 import { LaneComponent } from '../lane/lane.component';
 
@@ -13,42 +14,49 @@ import { LaneComponent } from '../lane/lane.component';
 export class GameBoardComponent implements OnInit {
 
   //TODO: implement models
-  gameData;
-  players;
+  answers: models.Answer[];
   laneData;
-  currentQuestion = -1;
+  currentQuestion = 0;
 
   constructor(
-    private tempService: TempService
+    private gameApiService: GameApiService
   ) { }
 
   ngOnInit() {
-    this.tempService.getAnswersAndBets().subscribe(
-      data => {
-        console.log("got game data: ", data);
-        this.gameData = data;
+    //TODO subscribe to empty answer set on initialize so that game board can be shown
+  }
 
-        //TODO support initial state
-        this.getAnswers();
-      },
-      error => {
-        console.log("error getting game data: ", error);
+  //TOCHECK: https://stackoverflow.com/questions/42657380/observable-polling/42659054#42659054
+  getAnswers() {
+    this.currentQuestion++;
+    //TODO remove / change to 7 question max
+    if (this.currentQuestion > 6) {
+      this.currentQuestion = 1;
+    }
+
+    //TODO remove
+    this.gameApiService.getPlayers(this.currentQuestion);
+
+    this.gameApiService.getAnswersForQuestion(this.currentQuestion).subscribe(
+      data => {
+        //TODO fix all this
+        this.answers = data["answers"];
+        var playerAnswers = this.answers.filter(a => a.guess != -1);
+        this.laneData = this.gameApiService.distributeAnswers(playerAnswers, this.gameApiService.players);
       }
+      //TODO error, ()
     );
   }
 
-  getAnswers() {
-    this.currentQuestion++;
-    //TODO remove / change to 7 question max?
-    if (this.currentQuestion >= this.gameData.length) {
-      this.currentQuestion = 0;
-    }
-    this.players = this.gameData[this.currentQuestion].players;
-    this.laneData = this.tempService.distributeAnswers(this.players);
-  }
-
   setBets() {
-    //TODO review separation of concerns here
-    this.tempService.setBets(this.laneData, this.gameData[this.currentQuestion].bets);
+    this.gameApiService.getBetsForQuestion(this.currentQuestion).subscribe(
+      data => {
+        //TODO fix all this
+        var bets = data["bets"];
+        this.gameApiService.setBets(this.laneData, bets);
+      }
+      //TODO error, ()
+    );
   }
+  
 }

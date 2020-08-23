@@ -9,9 +9,9 @@ import { HeaderComponent } from './header/header.component';
 import { GameBoardComponent } from './game-board/game-board.component';
 import { LaneComponent } from './lane/lane.component';
 import { BetComponent } from './bet/bet.component';
-
-import { TempService } from './temp.service';
 import { StatusBenchComponent } from './status-bench/status-bench.component';
+
+import { GameApiService } from './game-api.service';
 
 @NgModule({
   imports:      [ BrowserModule, FormsModule, HttpClientModule,
@@ -20,6 +20,6 @@ import { StatusBenchComponent } from './status-bench/status-bench.component';
     ]) ],
   declarations: [ AppComponent, HeaderComponent, GameBoardComponent, LaneComponent, BetComponent, StatusBenchComponent ],
   bootstrap:    [ AppComponent ],
-  providers: [TempService]
+  providers: [GameApiService]
 })
 export class AppModule { }

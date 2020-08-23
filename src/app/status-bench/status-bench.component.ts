@@ -1,6 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 
-import { TempService } from '../temp.service';
+import { GameApiService } from '../game-api.service';
+
+import { Player } from '../models';
 
 @Component({
   selector: 'app-status-bench',
@@ -9,21 +11,24 @@ import { TempService } from '../temp.service';
 })
 export class StatusBenchComponent implements OnInit {
 
-  playerData;
+  gameRoomId: number;
+  players: Player[];
 
   constructor(
-    private tempService: TempService
+    private gameApiService: GameApiService
   ) { }
 
   ngOnInit() {
-    this.tempService.getAnswersAndBets().subscribe(
+
+    //TODO remove
+    this.gameRoomId = 1;
+
+    this.gameApiService.getPlayers(this.gameRoomId).subscribe(
       data => {
-        //console.log("got player data: ", data);
-        this.playerData = data[0]["players"];
-        //console.log("status playerData: ", this.playerData);
+        this.players = data;
       },
       error => {
-        console.log("error getting player data: ", error);
+        console.log("error getting status player data: ", error);
       }
     );
   }

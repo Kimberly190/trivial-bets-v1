@@ -11,6 +11,7 @@ export class LaneComponent implements OnInit {
 
   @Input() laneData: any;
   @Input() bets: any;
+  @Input() answers: any;
 
   public get payRate(): number {
       return this.laneData.payRate;

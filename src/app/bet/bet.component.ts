@@ -7,9 +7,7 @@ import { Component, OnInit, Input } from '@angular/core';
 })
 export class BetComponent implements OnInit {
 
-  // @Input() player: number;
-  // @Input() amount: number;
-  @Input() betData: any;
+  @Input() bet: any;
 
   constructor() { }
 
