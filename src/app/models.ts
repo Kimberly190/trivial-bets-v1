@@ -7,6 +7,7 @@ export interface Player {
   playerNumber: number,
   name: string,
   isHost: boolean,
+  score?: number,
   gameRoomId: number
 }
 
@@ -32,7 +33,9 @@ export interface Bet {
 }
 
 export interface Result {
-  isBestGuess: boolean,
+  isWinningGuess: boolean,
   credit: number,
-  playerId: number
+  playerId: number,
+  player?: Player,
+  answer?: Answer
 }

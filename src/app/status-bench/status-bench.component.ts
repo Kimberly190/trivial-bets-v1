@@ -11,26 +11,13 @@ import { Player } from '../models';
 })
 export class StatusBenchComponent implements OnInit {
 
-  gameRoomId: number;
-  players: Player[];
+  get players(): Player[] { return this.gameApiService.players; };
 
   constructor(
     private gameApiService: GameApiService
   ) { }
 
   ngOnInit() {
-
-    //TODO remove
-    this.gameRoomId = 1;
-
-    this.gameApiService.getPlayers(this.gameRoomId).subscribe(
-      data => {
-        this.players = data;
-      },
-      error => {
-        console.log("error getting status player data: ", error);
-      }
-    );
   }
 
 }

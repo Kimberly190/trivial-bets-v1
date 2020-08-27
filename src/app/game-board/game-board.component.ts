@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+//TODO: can this wrapper be removed now that state-director exists?  else refactor some back into here?
+
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 import { GameApiService } from '../game-api.service';
 
@@ -13,50 +15,21 @@ import { LaneComponent } from '../lane/lane.component';
 })
 export class GameBoardComponent implements OnInit {
 
-  //TODO: implement models
-  answers: models.Answer[];
-  laneData;
-  currentQuestion = 0;
+  //TODO: implement model
+  @Input() laneData;
+  @Output() bet = new EventEmitter<models.Bet>();
 
   constructor(
     private gameApiService: GameApiService
   ) { }
 
   ngOnInit() {
-    //TODO subscribe to empty answer set on initialize so that game board can be shown
+    
   }
 
-  //TOCHECK: https://stackoverflow.com/questions/42657380/observable-polling/42659054#42659054
-  getAnswers() {
-    this.currentQuestion++;
-    //TODO remove / change to 7 question max
-    if (this.currentQuestion > 6) {
-      this.currentQuestion = 1;
-    }
-
-    //TODO remove
-    this.gameApiService.getPlayers(this.currentQuestion);
-
-    this.gameApiService.getAnswersForQuestion(this.currentQuestion).subscribe(
-      data => {
-        //TODO fix all this
-        this.answers = data["answers"];
-        var playerAnswers = this.answers.filter(a => a.guess != -1);
-        this.laneData = this.gameApiService.distributeAnswers(playerAnswers, this.gameApiService.players);
-      }
-      //TODO error, ()
-    );
-  }
-
-  setBets() {
-    this.gameApiService.getBetsForQuestion(this.currentQuestion).subscribe(
-      data => {
-        //TODO fix all this
-        var bets = data["bets"];
-        this.gameApiService.setBets(this.laneData, bets);
-      }
-      //TODO error, ()
-    );
+  onBet(bet: models.Bet) {
+    // Forward event to state-director
+    this.bet.emit(bet);
   }
   
 }

@@ -1,4 +1,4 @@
-<h2>PAYS<br>{{ payRate }} to 1</h2>
+<h2>PAYS<br>{{ laneData.payout }} to 1</h2>
 <div *ngIf="answers && answers.length > 0">
   <div *ngFor="let answer of answers" class="player-card player-{{answer.playerNumber}}">
     <h4>{{answer.name}}</h4>
@@ -9,4 +9,4 @@
   <div *ngIf="laneData.lane == 0" id="watermark">ALL ANSWERS TOO HIGH</div>
   <app-bet *ngFor="let bet of bets" class="bet" [bet]="bet"></app-bet>
 </div>
-<button class="bet-button">Bet</button>
+<button class="bet-button" (click)="placeBet()">Bet</button>

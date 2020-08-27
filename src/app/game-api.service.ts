@@ -7,11 +7,14 @@ import * as models from './models';
 @Injectable()
 export class GameApiService {
 
+  private apiEndpoint = 'https://trivial-bets.azurewebsites.net/api';
+
   NUM_LANES = 8;
-  payRates = [6, 5, 4, 3, 2, 3, 4, 5];
+  PAYOUTS = [6, 5, 4, 3, 2, 3, 4, 5];
+  //TODO: payout(lane i) = 2 + abs (4 - i)
+  //PAYOUTS = Array.from(Array(8), (_, i) => 2 + Math.abs(4 - i));
 
   gameRoom: models.GameRoom;
-  player: models.Player;
   players: models.Player[] = [];
   currentQAnswers: models.Answer[] = [];
 
@@ -19,90 +22,76 @@ export class GameApiService {
     private http: HttpClient
   ) { }
 
+  testLiveApi() {
+    return this.http.get(this.apiEndpoint + '/Result/ForQuestion/3');
+  }
+
   createGame(): Observable<models.GameRoom> {
-    //TODO this.http.post(gameRoom);
-    //TODO this.http.get(gameRoomId);
-    this.gameRoom = {
-      id: 1
-    };
-    return of(this.gameRoom);
+    return this.http.post<models.GameRoom>(this.apiEndpoint + '/GameRoom', { });
   }
 
-  createPlayer(name: string, isHost: boolean): void {
-    //TODO: use optional properties in interfaces to facilitate DTO?
-    // let player: any = {
-    //   name: name,
-    //   isHost: isHost
-    // };
-    //TODO this.http.post(player);
-    this.player = this.players[0];
+  createPlayer(player: models.Player): Observable<models.Player> {
+    return this.http.post<models.Player>(this.apiEndpoint + '/Player', player);
   }
 
-  //TODO adjust to function by gameRoomId
-  getPlayers(questionId: number): Observable<models.Player[]> {
+  getPlayers(gameRoomId: number) : Observable<models.Player[]> {
     this.players.length = 0;
 
-    this.getMockDataSource(questionId).subscribe(
-      data => {
-        data["players"].forEach(p => this.players.push(p));
+    //TODO is there a better way to manage this data sharing?
+    var source = this.http.get<models.Player[]>(this.apiEndpoint + '/Player/ForGameRoom/' + gameRoomId);
+    source.subscribe(
+      (data: models.Player[]) => {
+        data.forEach(p => this.players.push(p));
       },
       error => {
         console.log("error getting player data in game api service: ", error);
       }
     );
 
-    return of(this.players);
+    return source;
   }
 
-  createQuestion() {
-    //TODO
+  createQuestion(gameRoomId: number) : Observable<models.Question> {
+    return this.http.post<models.Question>(this.apiEndpoint + '/Question', { gameRoomId: gameRoomId });
   }
 
-  createAnswer() {
-    //TODO
+  getLatestQuestion(gameRoomId: number) : Observable<models.Question[]> {
+    //TODO fix once API updated; currently returns all quetions and caller sorts
+    return this.http.get<models.Question[]>(this.apiEndpoint + '/Question');
   }
 
-  getAnswersForQuestion(questionId: number) {
-    //TODO replace
-    return this.getMockDataSource(questionId);
+  createAnswer(answer: models.Answer) : Observable<models.Answer> {
+    return this.http.post<models.Answer>(this.apiEndpoint + '/Answer', answer);
   }
 
-  createBet() {
-    //TODO
+  getAnswersForQuestion(questionId: number) : Observable<models.Answer[]> {
+    return this.http.get<models.Answer[]>(this.apiEndpoint + '/Answer/ForQuestion/' + questionId);
   }
 
-  getBetsForQuestion(questionId: number) {
-    //TODO replace
-    return this.getMockDataSource(questionId);
+  createBet(bet: models.Bet) : Observable<models.Bet> {
+    return this.http.post<models.Bet>(this.apiEndpoint + '/Bet', bet);
   }
 
-  //TODO: updateQuestion, getResultsForQuestion, etc.
+  getBetsForQuestion(questionId: number) : Observable<models.Bet[]> {
+    return this.http.get<models.Bet[]>(this.apiEndpoint + '/Bet/ForQuestion/' + questionId);
+  }
 
-  getMockDataSource(questionId) {
-    switch (questionId) {
-      case 1:
-        return this.http.get('/assets/mock_data_g1q1.json');
-      case 2:
-        return this.http.get('/assets/mock_data_g1q2.json');
-      case 3:
-        return this.http.get('/assets/mock_data_g1q3.json');
-      case 4:
-        return this.http.get('/assets/mock_data_g1q4.json');
-      case 5:
-        return this.http.get('/assets/mock_data_g2q1.json');
-      case 6:
-        return this.http.get('/assets/mock_data_g3q1.json');
-      default:
-        return;
-    }
+  updateQuestion(question: models.Question) {
+    return this.http.put<models.Question>(this.apiEndpoint + '/Question/' + question.id, question);
+  }
+
+  getResultsForQuestion(questionId: number) : Observable<models.Result[]> {
+    return this.http.get<models.Result[]>(this.apiEndpoint + '/Result/ForQuestion/' + questionId);
+  }
+
+  updatePlayer(player: models.Player) {
+    return this.http.put<models.Player>(this.apiEndpoint + '/Player/' + player.id, player);
   }
 
   //TODO typed return
   //TODO can this be simplified? skip param players?
   // Precondition: these are player answers only
   distributeAnswers(answers, players): any[] {
-    //TODO remove? or remove param?
-    this.players = players;
     
     let laneResults = [];
 
@@ -144,7 +133,7 @@ export class GameApiService {
       sorted.splice(sorted.length  / 2, 0, []);
     }
 
-    //TODO check this formula  (-1 +1 ?) //TODO simplify?
+    //TODO simplify? / explain
     let startLane = Math.floor((this.NUM_LANES - 1 - sorted.length) / 2) + 1;
     for (let i = 0; i < this.NUM_LANES; i++) {
 
@@ -153,7 +142,7 @@ export class GameApiService {
        lane: i,
         answers: [],
         bets: [],
-        payRate: this.payRates[i],
+        payout: this.PAYOUTS[i],
       };
       if (i >= startLane && i < startLane + sorted.length) {
         laneData.answers.push(...sorted[i - startLane]);
@@ -166,6 +155,9 @@ export class GameApiService {
   }
 
   setBets(laneData, bets) {
+    // Clear the current bets.
+    laneData.forEach(d => d.bets.length = 0);
+
     for (let i = 0; i < bets.length; i++)
     {
       // Copy playerNumber to bet to simplify display logic
