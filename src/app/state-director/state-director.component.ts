@@ -35,13 +35,12 @@ export class StateDirectorComponent implements OnInit {
   question: models.Question = { id: undefined, gameRoomId: undefined, correctAnswer: undefined };
   answer: models.Answer = { id: undefined, guess: undefined, playerId: undefined, questionId: undefined };
   bet: models.Bet = { id: undefined, amount: undefined, payout: undefined, playerId: undefined, answerId: undefined };
+  defaultAnswer: models.Answer;
   
   allAnswers: models.Answer[];
   allResults: models.Result[];
-  winningGuesses: models.Result[] = [];
-  otherResults: models.Result[] = [];
-
-  defaultAnswer: models.Answer;
+  winningGuesses: models.Result[];
+  otherResults: models.Result[];
 
   get betAnswerValue() : number {
     return (this.allAnswers && this.bet)
@@ -56,7 +55,7 @@ export class StateDirectorComponent implements OnInit {
   //TODO contrast with http interceptor for loading solution
   @HostBinding('class.wait') loading: boolean = false;
   showGameBoard: boolean = false;
-  laneData: any; //TODO
+  laneData: any[] = []; //TODO remove init if not needed
   betsPlaced: number = 0;
   page: number;
 
@@ -75,7 +74,7 @@ export class StateDirectorComponent implements OnInit {
     this.gameApiService.createGame().subscribe(
       (data: models.GameRoom) => {
         this.gameRoom = data;
-        //TODO can shortcut?
+        //TODO can shortcut? / is this copy necessary?
         this.player.gameRoomId = this.gameRoom.id;
 
         this.page++;
@@ -96,7 +95,7 @@ export class StateDirectorComponent implements OnInit {
     this.page++;
   }
 
-  //TODO review / test
+  //TODO can back be enabled in bet screen, others?
   back() {
     if (this.page == this.PAGE_NUM_NEW_GAME) {
       // Reset
@@ -131,9 +130,8 @@ export class StateDirectorComponent implements OnInit {
 
   }
 
+  //TODO: replace manual refresh with polling + timeout until start of game
   refreshPlayers() {
-    //TODO review / test: update players to refresh status bench
-    //TODO: set polling with timeout
     this.gameApiService.getPlayers(this.gameRoom.id);
   }
 
@@ -141,6 +139,7 @@ export class StateDirectorComponent implements OnInit {
     this.loading = true;
 
     if (this.questionNumber == 0) {
+      // Make sure all players are known to this instance at start of game.
       this.refreshPlayers();
     }
 
@@ -177,7 +176,7 @@ export class StateDirectorComponent implements OnInit {
           );
 
           this.questionNumber++; //TODO remove when data-bound?
-          this.page++;
+          this.page = this.PAGE_NUM_ANSWER_Q;
           this.loading = false;
         },
         error => {
@@ -204,7 +203,7 @@ export class StateDirectorComponent implements OnInit {
           this.answer.playerId = this.player.id;
 
           this.questionNumber++; //TODO remove when data-bound?
-          this.page++;
+          this.page = this.PAGE_NUM_ANSWER_Q;
           this.loading = false;
         },
         error => {
@@ -302,7 +301,6 @@ export class StateDirectorComponent implements OnInit {
 
         this.loading = false;
 
-        //TODO test
         this.refreshBets();
       },
       error => {
@@ -343,7 +341,7 @@ export class StateDirectorComponent implements OnInit {
 
   updateQuestionGetResults() {
     if (this.player.isHost) {
-      // Update the question with the correct answer.
+      // Host updates the question with the correct answer...
       this.loading = true;
 
       this.gameApiService.updateQuestion(this.question).subscribe(
@@ -362,6 +360,7 @@ export class StateDirectorComponent implements OnInit {
         }
       );
     } else {
+      // ..other players just get it.
       this.loading = true;
 
       this.gameApiService.getLatestQuestion(this.gameRoom.id).subscribe(
@@ -390,9 +389,11 @@ export class StateDirectorComponent implements OnInit {
           // Populate player and answer to simplify display logic.
           r.player = this.gameApiService.players.find(p => p.id == r.playerId);
           r.answer = this.allAnswers.find(a => a.playerId == r.playerId);
+          //TODO remove after bugfix for 'answer is undefined for some instances but not others'
+          console.log('REMOVE on result, set player: ', r.player, ' and answer: ', r.answer);
         });
 
-        this.winningGuesses = this.allResults.filter(r => r.isWinningGuess);
+        this.winningGuesses = this.allResults.filter(r => r.isWinningGuess && r.playerId);
         this.otherResults = this.allResults.filter(r => !r.isWinningGuess);
 
         this.page++;
@@ -451,10 +452,10 @@ export class StateDirectorComponent implements OnInit {
     } else {
       // Reset.
       this.answer = { id: undefined, guess: undefined, playerId: undefined, questionId: undefined };
-      this.allAnswers.length = 0;
       this.bet = { id: undefined, amount: undefined, payout: undefined, playerId: undefined, answerId: undefined };
-      this.questionNumber++; //TODO remove when data-bound?
-      this.page = this.PAGE_NUM_ANSWER_Q;
+      this.laneData.length = 0;
+      
+      this.nextQuestion();
     }
   }
 
